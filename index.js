@@ -2,12 +2,16 @@
 const express = require('express');
 const app = express();
 app.use(express.json());
+//app.use(json())
+app.use(express.static('dist'))
 
 //const cors = require('cors');
 //app.use(cors());
 
 //const morgan = require('morgan');
 //app.use(morgan(':method  :response-time ms :url :body'));
+
+//url https://render-test-2-jrci.onrender.com/api/persons
 
 
 let persons = [
