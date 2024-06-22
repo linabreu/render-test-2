@@ -71,6 +71,7 @@ app.get('/api/persons', (request, response) => {
       response.json(persons)
       console.log(persons)
     })
+    console.log("this is the get request")
   })
 
 app.get('/', (request, response) => { //this is an endpoint
