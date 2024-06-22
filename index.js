@@ -2,11 +2,11 @@
 const express = require('express');
 const app = express();
 app.use(express.json());
-//app.use(json())
 app.use(express.static('dist'))
 
 //const cors = require('cors');
 //app.use(cors());
+//linabreu OrwZ2IQIYV4KUCUN
 
 //const morgan = require('morgan');
 //app.use(morgan(':method  :response-time ms :url :body'));
@@ -14,7 +14,7 @@ app.use(express.static('dist'))
 //url https://render-test-2-jrci.onrender.com/api/persons
 
 
-let persons = [
+/*let persons = [
     { 
       "id": 1,
       "name": "Arto Hellas", 
@@ -40,7 +40,29 @@ let persons = [
       "name": "Contact from backend", 
       "number": "39-23-4444"
     }
-]
+]*/
+
+const mongoose = require('mongoose')
+const password = process.argv[2]
+
+const url =
+ `mongodb+srv://fullstack:${password}@fullstackopen.zebosum.mongodb.net/persons-db?retryWrites=true&w=majority`
+
+mongoose.set('strictQuery',false)
+mongoose.connect(url)
+
+const personSchema = new mongoose.Schema({
+  Name: String,
+  Number: String,
+})
+
+const Person = mongoose.model('Person', personSchema)
+
+app.get('/api/notes', (request, response) => {
+    Note.find({}).then(notes => {
+      response.json(notes)
+    })
+  })
 
 app.get('/', (request, response) => { //this is an endpoint
     response.send('<h1>Hello World!</h1>')
