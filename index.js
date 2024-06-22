@@ -46,7 +46,7 @@ const mongoose = require('mongoose')
 const password = process.argv[2]
 
 const url =
- `mongodb+srv://fullstack:${password}@fullstackopen.zebosum.mongodb.net/persons-db?retryWrites=true&w=majority`
+ `mongodb+srv://fullstack:fullstack@fullstackopen.zebosum.mongodb.net/persons-db?retryWrites=true&w=majority`
 
 mongoose.set('strictQuery',false)
 mongoose.connect(url)
