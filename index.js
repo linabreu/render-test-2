@@ -59,7 +59,7 @@ const personSchema = new mongoose.Schema({
 const Person = mongoose.model('Person', personSchema)
 
 app.get('/api/persons', (request, response) => {
-    Note.find({}).then(persons => {
+    Person.find({}).then(persons => {
       response.json(persons)
     })
   })
