@@ -69,6 +69,7 @@ const Person = mongoose.model('Person', personSchema)
 app.get('/api/persons', (request, response) => {
     Person.find({}).then(persons => {
       response.json(persons)
+      console.log(persons)
     })
   })
 
