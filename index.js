@@ -1,78 +1,117 @@
 
+require('dotenv').config()
 const express = require('express');
 const app = express();
 app.use(express.json());
 app.use(express.static('dist'))
-
-//const cors = require('cors');
-//app.use(cors());
-//linabreu OrwZ2IQIYV4KUCUN
-
-//const morgan = require('morgan');
-//app.use(morgan(':method  :response-time ms :url :body'));
-
-//url https://render-test-2-jrci.onrender.com/api/persons
+const Person = require('./models/person')
 
 
-/*let persons = [
-    { 
-      "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    },
-    { 
-      "id": 5,
-      "name": "Contact from backend", 
-      "number": "39-23-4444"
-    }
-]*/
-
-const mongoose = require('mongoose')
-const password = process.argv[2]
-
-const url =
- `mongodb+srv://fullstack:fullstack@fullstackopen.zebosum.mongodb.net/persons-db?retryWrites=true&w=majority`
-
-mongoose.set('strictQuery',false)
-mongoose.connect(url)
-
-const personSchema = new mongoose.Schema({
-  Name: String,
-  Number: String,
-})
-
-personSchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString()
-    delete returnedObject._id
-    delete returnedObject.__v
-  }
-})
-
-const Person = mongoose.model('Person', personSchema)
-
-app.get('/api/persons', (request, response) => {
+//get all persons
+app.get('/api/persons', (request, response) => 
+  {
     Person.find({}).then(persons => {
       response.json(persons)
       console.log(persons)
     })
-    console.log("this is the get request")
   })
+
+  //create a new person entry
+  app.post('/api/persons', (request, response, next) => 
+    {
+      const body = request.body
+      console.log(body)
+      console.log(body.Name)
+    
+      /*if (body.Name === undefined || body.Number === undefined) 
+      {
+        return response.status(400).json({ error: 'content missing' })
+      }*/
+    
+      const person = new Person({
+        Name: body.Name,
+        Number: body.Number
+      })
+    
+      person.save().then(savedPerson => {
+        response.json(savedPerson)
+      })
+      .catch(error => next(error))
+    })
+
+    //get a specific person
+    app.get('/api/persons/:id', (request, response, next) => 
+      {
+        Person.findById(request.params.id)
+          .then(person => {
+      
+            if (person) 
+            {
+              response.json(person)
+            } else
+            {
+              response.status(404).end()
+            }
+          })
+          .catch(error => next(error))
+      })
+
+    //delete
+    app.delete('/api/persons/:id', (request, response, next) => 
+    {
+      Person.findByIdAndDelete(request.params.id)
+        .then(result => 
+        {
+          response.status(204).end()
+        })
+        .catch(error => next(error))
+    }) 
+
+    //update
+    app.put('/api/persons/:id', (request, response, next) => 
+    {
+      const body = request.body
+    
+      const person = 
+      {
+        Name: body.Name,
+        Number: body.Name,
+      }
+    
+      Note.findByIdAndUpdate(request.params.id, person, { new: true })
+        .then(updatedPerson => 
+        {
+          response.json(updatedPerson)
+        })
+        .catch(error => next(error))
+    })
+
+    const unknownEndpoint = (request, response) => 
+    {
+      response.status(404).send({ error: 'unknown endpoint' })
+    }
+    app.use(unknownEndpoint)
+
+    const errorHandler = (error, request, response, next) => 
+      {
+        console.error(error.message)
+      
+        if (error.name === 'CastError') 
+        {
+          return response.status(400).send({ error: 'malformatted id' })
+        }
+        else if (error.name === 'ValidationError') 
+        {
+          return response.status(400).json({ error: error.message })
+        }
+        next(error)
+      }
+      app.use(errorHandler)
+
+
+
+
+/*
 
 app.get('/', (request, response) => { //this is an endpoint
     response.send('<h1>Hello World!</h1>')
@@ -115,14 +154,10 @@ app.get('/api/info', (request, response) => {
     response.status(204).end()
   })
 
-  const generateId = () => {
-    const maxId = persons.length > 0
-      ? Math.max(...persons.map(n => n.id))
-      : 0
-    return maxId + 1
-  }
+
+
   
-  app.post('/api/persons', (request, response) => {
+  /*app.post('/api/persons', (request, response) => {
     const body = request.body
   
     if ((!body.name) || (!body.number))
@@ -131,7 +166,7 @@ app.get('/api/info', (request, response) => {
         error: 'Missing contact information' 
       })
     }
-    else if (persons.find(person => person.name === body.name))
+    else if (Person.find(person => person.name === body.name))
     {
       return response.status(400).json({ 
         error: 'Contact already exists!' 
@@ -150,11 +185,10 @@ app.get('/api/info', (request, response) => {
   
     response.json(person)
     //morgan.token('body', request => JSON.stringify(body))
-  })
+  })*/
 
-
-  const PORT = process.env.PORT || 3001
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
-  })
+const PORT = process.env.PORT
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
+})
 

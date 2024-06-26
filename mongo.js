@@ -9,14 +9,21 @@ mongoose.set('strictQuery',false)
 mongoose.connect(url)
 
 const personSchema = new mongoose.Schema({
-  Name: String,
-  Number: String,
+  Name: 
+  {
+    type: String,
+    required: true,
+    lowercase: true,
+    trim: true,
+    minlength: 4,
+    maxlength: 15
+  },
+  Number:
+  {
+    type: String,
+    minlength: 1,
+    required: [true, 'Contact phone number is required!']
+  }
 })
 
 const Person = mongoose.model('Person', personSchema)
-
-app.get('/api/notes', (request, response) => {
-    Note.find({}).then(notes => {
-      response.json(notes)
-    })
-  })
